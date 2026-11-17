@@ -10,6 +10,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Syntax
-        run: for f in */*.sh; do bash -n "$f"; done
+        run: |
+          for f in */*.sh; do bash -n "$f"; done
+          python3 -m py_compile lib/bundle.py
       - name: ShellCheck
         run: shellcheck -x -S warning */*.sh

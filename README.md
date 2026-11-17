@@ -2,14 +2,19 @@
 
 Scripts that build Linux applications from source into portable AppImages.
 
-Each script builds inside a Debian 12 container, so the AppImage runs on any
-x86_64 distro with glibc 2.36 or newer: Debian 12, Ubuntu 22.10+, Fedora 37+,
-Arch, openSUSE Tumbleweed and the like. Source archives and tools are pinned
-to exact versions and checked against SHA-256 hashes before use.
+Each script builds inside a Debian container, so the AppImage runs on any
+x86_64 distro with the same or a newer glibc. Source archives and tools are
+pinned to exact versions and checked against SHA-256 hashes before use.
 
-| App | Script | Version |
-|---|---|---|
-| [MediaInfo](https://mediaarea.net/en/MediaInfo) (GUI + CLI) | [`mediainfo/build-mediainfo-gui-appimage.sh`](mediainfo/build-mediainfo-gui-appimage.sh) | 26.10 |
+| App | Script | Version | Built on | Runs on |
+|---|---|---|---|---|
+| [MediaInfo](https://mediaarea.net/en/MediaInfo) (GUI + CLI) | [`mediainfo/build-mediainfo-gui-appimage.sh`](mediainfo/build-mediainfo-gui-appimage.sh) | 26.10 | Debian 12 | glibc 2.36+: Debian 12, Ubuntu 22.10+, Fedora 37+, Arch |
+| [Mousam](https://github.com/amit9838/mousam) (weather) | [`mousam/build-mousam-appimage.sh`](mousam/build-mousam-appimage.sh) | 3.0.0 | Debian 13 | glibc 2.41+: Debian 13, Ubuntu 25.04+, Fedora 42+, Arch |
+
+Mousam needs libadwaita 1.6 or newer, which older Debian releases don't have,
+so it is built on Debian 13 and carries its own Python, GTK 4 and libadwaita.
+Small fixes on top of a release live in `<app>/patches/` and are applied in
+order; the build stops if one no longer applies.
 
 ## Requirements
 
@@ -23,21 +28,21 @@ On Arch: `sudo pacman -S podman`.
 
 ```sh
 ./mediainfo/build-mediainfo-gui-appimage.sh
+./mousam/build-mousam-appimage.sh
 ```
 
-The AppImage is written to `~/Desktop`. Run it to open the GUI, or pass
-`--cli` for the command-line tool:
+The AppImage is written to `~/Desktop`. The MediaInfo AppImage opens the GUI,
+or runs the command-line tool with `--cli`:
 
 ```sh
-./MediaInfo-26.10-x86_64.AppImage                   # GUI
-./MediaInfo-26.10-x86_64.AppImage --cli video.mkv   # CLI
+./MediaInfo-26.10-x86_64.AppImage --cli video.mkv
 ```
 
 Settings, all optional:
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `WORK_DIR` | `~/.cache/mediainfo-appimage` | Downloads and build files |
+| `WORK_DIR` | `~/.cache/appimage-build/<app>` | Downloads and build files |
 | `OUT_DIR` | `~/Desktop` | Where the AppImage goes |
 | `CONTAINER_ENGINE` | `podman`, else `docker` | Container tool to use |
 
@@ -59,6 +64,18 @@ still matches. Delete `WORK_DIR` to start over.
   are installed with apt, which checks their signatures.
 - **Licenses.** Each AppImage carries the app's license files and the Debian
   copyright file of every bundled library under `usr/share/licenses`.
+
+## Layout
+
+| Path | Contents |
+|---|---|
+| `<app>/build-<app>-appimage.sh` | One script per app: pins, the container build, the AppRun launcher |
+| `lib/common.sh` | Shared shell helpers: checked downloads, running the container, packing |
+| `lib/bundle.py` | Copies shared libraries into the AppDir, sets RUNPATHs, checks that everything resolves, collects Debian copyright files |
+
+Each script runs twice: on the host it downloads and checks the sources, then
+starts itself in the container with `--in-container` to build the AppDir, and
+finally packs the AppImage on the host.
 
 ## Updating a pin
 

@@ -1,0 +1,17 @@
+Fit the main view on 1440x810 screens without scrolling
+
+At 1440x810 (773 px of usable height), the main view is 7 px taller than the
+window, so a scrollbar appears for the last few pixels. Use the same 10 px
+margin at the top as at the bottom.
+
+--- a/src/mousam.py
++++ b/src/mousam.py
+@@ -255,7 +255,7 @@
+ 
+         # Main Grid Layout
+         grid = Gtk.Grid()
+-        grid.set_margin_top(20)
++        grid.set_margin_top(10)
+         grid.set_margin_bottom(10)
+         grid.set_margin_start(12)
+         grid.set_margin_end(12)

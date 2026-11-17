@@ -1,3 +1,4 @@
 *.AppImage
 *.part
 *.AppDir/
+__pycache__/

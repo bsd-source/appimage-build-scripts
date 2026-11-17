@@ -1,0 +1,15 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Syntax
+        run: for f in */*.sh; do bash -n "$f"; done
+      - name: ShellCheck
+        run: shellcheck -x -S warning */*.sh

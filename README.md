@@ -16,6 +16,21 @@ so it is built on Debian 13 and carries its own Python, GTK 4 and libadwaita.
 Small fixes on top of a release live in `<app>/patches/` and are applied in
 order; the build stops if one no longer applies.
 
+## Downloads
+
+Prebuilt AppImages are on the
+[Releases](https://github.com/bsd-source/appimage-build-scripts/releases) page,
+one release per app version (tags like `mousam-3.0.0`). Each comes with a
+`.sha256` file:
+
+```sh
+sha256sum -c Mousam-3.0.0-x86_64.AppImage.sha256
+chmod +x Mousam-3.0.0-x86_64.AppImage
+./Mousam-3.0.0-x86_64.AppImage
+```
+
+To build one yourself, read on.
+
 ## Requirements
 
 - x86_64 Linux
